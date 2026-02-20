@@ -7,6 +7,7 @@
 
 import { basename } from 'node:path';
 
+// Exact basename matches
 export const PROTECTED = new Set([
   'CLAUDE.md',
   'SHARED-CONTEXT.md',
@@ -16,6 +17,24 @@ export const PROTECTED = new Set([
   'TOOLS.md',
   'MEMORY.md',
 ]);
+
+// Pattern matches (case-insensitive, checked against full path and basename)
+export const PROTECTED_PATTERNS = [
+  /memory/i,
+  /memories/i,
+  /journal/i,
+  /diary/i,
+  /daily.*log/i,
+];
+
+function isProtected(filePath) {
+  const name = basename(filePath);
+  if (PROTECTED.has(name)) return name;
+  for (const pattern of PROTECTED_PATTERNS) {
+    if (pattern.test(filePath)) return name + ` (matched pattern: ${pattern})`;
+  }
+  return null;
+}
 
 function deny(reason) {
   const output = {
@@ -35,8 +54,10 @@ function countLines(str) {
 
 // CLI mode: node guard.mjs --list
 if (process.argv.includes('--list')) {
-  console.log('Protected files:');
+  console.log('Protected files (exact):');
   for (const f of PROTECTED) console.log(`  ${f}`);
+  console.log('Protected patterns:');
+  for (const p of PROTECTED_PATTERNS) console.log(`  ${p}`);
   process.exit(0);
 }
 
@@ -60,13 +81,14 @@ async function main() {
   const fileName = basename(filePath);
 
   // Only check protected files
-  if (!PROTECTED.has(fileName)) {
+  const match = isProtected(filePath);
+  if (!match) {
     process.exit(0);
   }
 
   // Block Write on protected files
   if (toolName === 'Write') {
-    deny(`BLOCKED: Write tool on ${fileName} is not allowed. Use Edit to make specific changes. Never overwrite protected files.`);
+    deny(`BLOCKED: Write tool on ${match} is not allowed. Use Edit to make specific changes. Never overwrite protected files.`);
     process.exit(0);
   }
 
@@ -80,13 +102,13 @@ async function main() {
 
     // Block net removal of more than 2 lines
     if (removed > 2) {
-      deny(`BLOCKED: You are removing ${removed} lines from ${fileName} (old: ${oldLines} lines, new: ${newLines} lines). Re-read the file and add content instead of replacing it.`);
+      deny(`BLOCKED: You are removing ${removed} lines from ${match} (old: ${oldLines} lines, new: ${newLines} lines). Re-read the file and add content instead of replacing it.`);
       process.exit(0);
     }
 
     // Block large replacements (swapping big chunks even if line count is similar)
     if (oldLines > 4 && oldString !== newString) {
-      deny(`BLOCKED: You are replacing ${oldLines} lines in ${fileName}. Edit smaller sections or append new content instead of replacing existing content.`);
+      deny(`BLOCKED: You are replacing ${oldLines} lines in ${match}. Edit smaller sections or append new content instead of replacing existing content.`);
       process.exit(0);
     }
   }

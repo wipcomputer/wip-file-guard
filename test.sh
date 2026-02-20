@@ -91,5 +91,26 @@ check "Allow Edit replacing 3 lines in CLAUDE.md" \
   '{"tool_name":"Edit","tool_input":{"file_path":"/foo/CLAUDE.md","old_string":"a\nb\nc","new_string":"x\ny\nz"}}' \
   "allow"
 
+# Pattern matching
+check "Block Write to file in memory/ directory" \
+  '{"tool_name":"Write","tool_input":{"file_path":"/workspace/memory/2026-02-19.md","content":"new"}}' \
+  "block"
+
+check "Block Write to memories.md" \
+  '{"tool_name":"Write","tool_input":{"file_path":"/foo/memories.md","content":"new"}}' \
+  "block"
+
+check "Block Write to journal file" \
+  '{"tool_name":"Write","tool_input":{"file_path":"/docs/journals/2026-02-19-the-receipt.md","content":"new"}}' \
+  "block"
+
+check "Block Edit removing lines from daily log" \
+  '{"tool_name":"Edit","tool_input":{"file_path":"/memory/daily/2026-02-19.md","old_string":"a\nb\nc\nd\ne","new_string":"x"}}' \
+  "block"
+
+check "Allow Write to unrelated file with no pattern match" \
+  '{"tool_name":"Write","tool_input":{"file_path":"/src/utils/helper.js","content":"new"}}' \
+  "allow"
+
 echo ""
 echo "Results: $PASS passed, $FAIL failed"
