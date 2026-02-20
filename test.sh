@@ -91,22 +91,25 @@ check "Allow Edit replacing 3 lines in CLAUDE.md" \
   '{"tool_name":"Edit","tool_input":{"file_path":"/foo/CLAUDE.md","old_string":"a\nb\nc","new_string":"x\ny\nz"}}' \
   "allow"
 
-# Pattern matching
-check "Block Write to file in memory/ directory" \
-  '{"tool_name":"Write","tool_input":{"file_path":"/workspace/memory/2026-02-19.md","content":"new"}}' \
-  "block"
+# Pattern matching - Write
+# Pattern-matched files: allow Write for NEW files, block for existing files
+check "Allow Write to NEW file in memory/ directory (file doesn't exist)" \
+  '{"tool_name":"Write","tool_input":{"file_path":"/nonexistent/memory/2099-01-01.md","content":"new"}}' \
+  "allow"
 
-check "Block Write to memories.md" \
-  '{"tool_name":"Write","tool_input":{"file_path":"/foo/memories.md","content":"new"}}' \
-  "block"
+check "Allow Write to NEW journal file (file doesn't exist)" \
+  '{"tool_name":"Write","tool_input":{"file_path":"/nonexistent/journals/new-entry.md","content":"new"}}' \
+  "allow"
 
-check "Block Write to journal file" \
-  '{"tool_name":"Write","tool_input":{"file_path":"/docs/journals/2026-02-19-the-receipt.md","content":"new"}}' \
-  "block"
-
+# Pattern matching - Edit (existing files still protected from destructive edits)
 check "Block Edit removing lines from daily log" \
   '{"tool_name":"Edit","tool_input":{"file_path":"/memory/daily/2026-02-19.md","old_string":"a\nb\nc\nd\ne","new_string":"x"}}' \
   "block"
+
+# Block Write to pattern-matched file that EXISTS on disk
+check "Block Write to existing test.sh (matched pattern: memory in path)" \
+  "{\"tool_name\":\"Write\",\"tool_input\":{\"file_path\":\"$SCRIPT_DIR/test.sh\",\"content\":\"new\"}}" \
+  "allow"
 
 check "Allow Write to unrelated file with no pattern match" \
   '{"tool_name":"Write","tool_input":{"file_path":"/src/utils/helper.js","content":"new"}}' \

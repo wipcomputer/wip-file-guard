@@ -6,6 +6,7 @@
 // - Blocks Edit when net line removal > 2 lines
 
 import { basename } from 'node:path';
+import { existsSync } from 'node:fs';
 
 // Exact basename matches
 export const PROTECTED = new Set([
@@ -87,8 +88,15 @@ async function main() {
   }
 
   // Block Write on protected files
+  // Exact matches: always block Write (use Edit instead)
+  // Pattern matches: only block if file already exists (allow creating new files)
   if (toolName === 'Write') {
-    deny(`BLOCKED: Write tool on ${match} is not allowed. Use Edit to make specific changes. Never overwrite protected files.`);
+    const isExactMatch = PROTECTED.has(fileName);
+    if (isExactMatch || existsSync(filePath)) {
+      deny(`BLOCKED: Write tool on ${match} is not allowed. Use Edit to make specific changes. Never overwrite protected files.`);
+      process.exit(0);
+    }
+    // Pattern match but file doesn't exist yet — allow creation
     process.exit(0);
   }
 
