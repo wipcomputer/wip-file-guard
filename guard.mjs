@@ -7,7 +7,7 @@
 
 import { basename } from 'node:path';
 
-const PROTECTED = new Set([
+export const PROTECTED = new Set([
   'CLAUDE.md',
   'SHARED-CONTEXT.md',
   'SOUL.md',
@@ -31,6 +31,13 @@ function deny(reason) {
 function countLines(str) {
   if (!str) return 0;
   return str.split('\n').length;
+}
+
+// CLI mode: node guard.mjs --list
+if (process.argv.includes('--list')) {
+  console.log('Protected files:');
+  for (const f of PROTECTED) console.log(`  ${f}`);
+  process.exit(0);
 }
 
 async function main() {

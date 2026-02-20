@@ -1,5 +1,5 @@
 #!/bin/bash
-# test.sh - Test cc-file-guard hook
+# test.sh - Test wip-file-guard hook
 # Run: bash test.sh
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
@@ -35,7 +35,7 @@ check() {
   fi
 }
 
-echo "cc-file-guard tests"
+echo "wip-file-guard tests"
 echo "==================="
 echo ""
 
