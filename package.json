@@ -1,0 +1,12 @@
+{
+  "name": "cc-file-guard",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "PreToolUse hook for Claude Code. Blocks destructive edits to protected files.",
+  "main": "guard.mjs",
+  "scripts": {
+    "test": "bash test.sh"
+  },
+  "author": "Parker Todd Brooks",
+  "license": "MIT"
+}
