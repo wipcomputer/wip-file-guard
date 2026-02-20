@@ -32,6 +32,14 @@ The agent gets a deny message explaining what happened and telling it to re-read
 
 ## Install
 
+### Universal Installer
+
+```bash
+wip-install wipcomputer/wip-file-guard
+```
+
+Detects all interfaces and installs them. See [wip-universal-installer](https://github.com/wipcomputer/wip-universal-installer).
+
 ### For AI Agents
 
 Open your AI coding tool and say:
