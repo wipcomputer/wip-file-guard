@@ -70,7 +70,7 @@ async function main() {
     process.exit(0);
   }
 
-  // For Edit, check line removal
+  // For Edit, check line removal AND large replacements
   if (toolName === 'Edit') {
     const oldString = toolInput.old_string || '';
     const newString = toolInput.new_string || '';
@@ -78,8 +78,15 @@ async function main() {
     const newLines = countLines(newString);
     const removed = oldLines - newLines;
 
+    // Block net removal of more than 2 lines
     if (removed > 2) {
       deny(`BLOCKED: You are removing ${removed} lines from ${fileName} (old: ${oldLines} lines, new: ${newLines} lines). Re-read the file and add content instead of replacing it.`);
+      process.exit(0);
+    }
+
+    // Block large replacements (swapping big chunks even if line count is similar)
+    if (oldLines > 4 && oldString !== newString) {
+      deny(`BLOCKED: You are replacing ${oldLines} lines in ${fileName}. Edit smaller sections or append new content instead of replacing existing content.`);
       process.exit(0);
     }
   }
