@@ -2,7 +2,7 @@
   "name": "@wipcomputer/wip-file-guard",
   "version": "1.0.0",
   "type": "module",
-  "description": "PreToolUse hook that blocks destructive edits to protected files. For Claude Code and OpenClaw.",
+  "description": "Hook that blocks destructive edits to protected identity files. For Claude Code CLI and OpenClaw.",
   "main": "guard.mjs",
   "bin": {
     "wip-file-guard": "./guard.mjs"
