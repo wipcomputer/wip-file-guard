@@ -32,109 +32,39 @@ The agent gets a deny message explaining what happened and telling it to re-read
 
 ## Install
 
-### Universal Installer
-
-```bash
-wip-install wipcomputer/wip-file-guard
-```
-
-Detects all interfaces and installs them. See [wip-universal-installer](https://github.com/wipcomputer/wip-universal-installer).
-
-### For AI Agents
-
 Open your AI coding tool and say:
 
 ```
-Clone wipcomputer/wip-file-guard and install it as a PreToolUse hook.
+Read the README at github.com/wipcomputer/wip-file-guard.
+Then explain to me:
+1. What is this tool?
+2. What does it do?
+3. What would it change or fix in our current system?
+
+Then ask me:
+- Do you have more questions?
+- Do you want to integrate it into our system?
+- Do you want to clone it (use as-is) or fork it (so you can contribute back if you find bugs)?
 ```
 
-Your agent will clone the repo, read this README, and configure the hook in your settings. That's it.
+Your agent will read the repo, explain the tool, and walk you through integration interactively.
 
-### Claude Code
+Also see **[wip-release](https://github.com/wipcomputer/wip-release)** ... one-command release pipeline for agent-native software.
 
-Add to `~/.claude/settings.json`:
+See [REFERENCE.md](REFERENCE.md) for manual install instructions (Claude Code, OpenClaw, CLI).
 
-```json
-{
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"/path/to/wip-file-guard/guard.mjs\"",
-            "timeout": 5
-          }
-        ]
-      }
-    ]
-  }
-}
-```
+## Four Interfaces
 
-Replace `/path/to/wip-file-guard/` with where you cloned the repo.
+One core, four interfaces into the same guard logic.
 
-### OpenClaw
-
-Add to your OpenClaw installation's `extensions/` directory:
-
-```bash
-cp -r wip-file-guard ~/.openclaw/extensions/wip-file-guard
-```
-
-The `openclaw.plugin.json` registers a `before_tool_use` lifecycle hook that applies the same rules.
-
-### CLI
-
-```bash
-# List protected files
-node guard.mjs --list
-
-# Test the guard with a simulated input
-echo '{"tool_name":"Write","tool_input":{"file_path":"/foo/CLAUDE.md"}}' | node guard.mjs
-
-# Run the test suite
-bash test.sh
-```
-
-## Four Doors
-
-This tool follows the WIP.computer four-door architecture. One core, four interfaces.
-
-| Door | File | What it does |
-|------|------|-------------|
+| Interface | File | What it does |
+|-----------|------|-------------|
 | **Core** | `guard.mjs` | Pure guard logic. Reads stdin JSON, decides allow/deny. |
 | **Claude Code** | `guard.mjs` (PreToolUse hook) | Hooks into CC's PreToolUse event. Blocks before the edit happens. |
 | **OpenClaw** | `openclaw.plugin.json` | Lifecycle hook for OpenClaw agents. Same rules, different runtime. |
 | **CLI** | `guard.mjs --list`, `test.sh` | Testing and inspection from the command line. |
 
-## Customization
-
-### Adding Protected Files
-
-Edit the `PROTECTED` set in `guard.mjs`:
-
-```javascript
-const PROTECTED = new Set([
-  'CLAUDE.md',
-  'SHARED-CONTEXT.md',
-  'SOUL.md',
-  'IDENTITY.md',
-  'CONTEXT.md',
-  'TOOLS.md',
-  'MEMORY.md',
-  'YOUR-FILE-HERE.md',   // add yours
-]);
-```
-
-### Changing the Line Threshold
-
-The default blocks edits that remove more than 2 net lines. Change the threshold in the Edit handler:
-
-```javascript
-if (removed > 2) {   // change 2 to your threshold
-```
+See [REFERENCE.md](REFERENCE.md) for customization (adding protected files, changing thresholds).
 
 ## Tests
 
