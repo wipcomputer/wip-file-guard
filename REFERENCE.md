@@ -3,6 +3,17 @@
 
 Manual install instructions, CLI usage, and customization.
 
+## Install
+
+Install to your LDM OS home:
+
+```bash
+mkdir -p ~/.ldm/extensions/wip-file-guard
+cp guard.mjs openclaw.plugin.json package.json ~/.ldm/extensions/wip-file-guard/
+```
+
+All config paths should point to the installed location (`~/.ldm/extensions/`), not the source repo.
+
 ## Claude Code
 
 Add to `~/.claude/settings.json`:
@@ -16,7 +27,7 @@ Add to `~/.claude/settings.json`:
         "hooks": [
           {
             "type": "command",
-            "command": "node \"/path/to/wip-file-guard/guard.mjs\"",
+            "command": "node ~/.ldm/extensions/wip-file-guard/guard.mjs",
             "timeout": 5
           }
         ]
@@ -26,14 +37,10 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
-Replace `/path/to/wip-file-guard/` with where you cloned the repo.
-
 ## OpenClaw
 
-Add to your OpenClaw installation's `extensions/` directory:
-
 ```bash
-cp -r wip-file-guard ~/.openclaw/extensions/wip-file-guard
+cp -r ~/.ldm/extensions/wip-file-guard ~/.openclaw/extensions/wip-file-guard
 ```
 
 The `openclaw.plugin.json` registers a `before_tool_use` lifecycle hook that applies the same rules.
